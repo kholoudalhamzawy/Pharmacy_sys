@@ -4,96 +4,115 @@
 #include <string>
 #include <vector>
 using namespace std;
-class med{
-protected:
-    string name,type;
-    int id;
-    double price;
+class Dosage_behavior{
 public:
-    med();
-    med(const string& name,const int& id,const double& price);
-
-    void set_name(const string& name);
-    const string& get_name() const;
-    void set_id(const int& id);
-    const int& get_id() const;
-    void set_price(const double& price);
-    const double& get_price() const;
-    ///pure virtual definetion have to be with the word virtual, and u cant use virtual out side the clas, aka in the pharma.cpp
-    virtual const string& get_type()=0;
-    virtual void show_dosage()const=0;
-    virtual med* clone()const=0;
-    virtual ~med();
-
+    Dosage_behavior();
+    virtual void show_dosage() const;
+    virtual void set_dosage();
+    ~Dosage_behavior();
 };
 
-
-class inject: public med{
+class Inject_dosage : public Dosage_behavior{
 protected:
     int num_of_injects;
     double size_of_needle;
 public:
-    inject();
-    inject(const string& name,const int& id,const double& price,const int& num_of_injects,const double& size_of_needle);
-    const string& get_type() override;
-
-    void set_needle_size(const double& size);
-    const double& get_needle_size()const ;
-    void set_injection_times(const int& num);
-    const int& get_injection_times() const;
-    void show_dosage()const override;//
-    med* clone() const override ;
-
-    ~inject();
-
+    Inject_dosage();
+    void show_dosage()const override;
+    void set_dosage() override;
+    ~Inject_dosage();
 };
 
-class pill: public med {
+class Pill_dosage: public Dosage_behavior{
 protected:
     int pills_num;
     double med_concentration;
 public:
-    pill();
-    pill(const string &name, const int &id, const double &price, const int &pills_num, const double &cons);
-    const string& get_type() override; //
-    const int &get_pills_num() const ;
-    void set_pills_num(const int &num);
-    const double &get_med_concentration() const;
+    Pill_dosage();
+    void show_dosage()const override;
+    void set_dosage() override;
+    ~Pill_dosage();
+};
 
-    void set_med_concentration(const double &cons);
+class Preservation_behavior{
+public:
+    virtual void show_preservation () const;
+};
 
-    void show_dosage() const override ;
+class Moderate_preservation: public Preservation_behavior{
+public:
+    void show_preservation  () const override;
+};
 
-    med *clone() const override ;
+class Cold_preservation: public Preservation_behavior{
+public:
+    void show_preservation() const override;
+};
 
-    ~pill();
+class med{
+protected:
+    int id;double price;
+    Dosage_behavior* dosageBehavior;
+    Preservation_behavior* preservationBehavior;
+public:
+    med();
+    med(const int& id,const double& price);
+    void set_id(const int& id);
+    const int &get_id() const;
+    void set_price(const double& price);
+    const double& get_price() const;
+    virtual void show_type()const;
+    void set_dosage_behavior(Dosage_behavior* db);
+    void set_preservation_behavior(Preservation_behavior* pb);
+    void show_preservation() const;
+    void show_dosage()const;
+    void set_dosage();
+    ~med();
 
 };
 
-class med_manager {
+class Vitamins: public med {
+protected:
+    Pill_dosage *pd;
+    Moderate_preservation *mp;
+public:
+    Vitamins(const int &id, const double &price);
+    void show_type() const override;
+    ~Vitamins();
+};
+
+class Sedatives: public med{
+protected:
+    Inject_dosage* Id;
+    Cold_preservation* cp;
+public:
+    Sedatives(const int& id,const double& price);
+    void show_type()const override;
+    ~Sedatives();
+};
+
+class med_manager{
 protected:
     vector<med *> all_meds;
 public:
     med_manager();
-
-    const vector<med*>& get_meds()const;
-    bool valid_id(const int &id)const;//
+    bool valid_id(const int &id)const;
+    void delete_med( const int &id);
+    void add_med( med *medicine);
+    void update_price(int id,double new_price);
     void show_med(const int &id)const;
-    void show_all_meds()const; //
-    void add_med( med &medicine);//
-    void delete_med( const int &id);//
-    void update_price(int id,double new_price);//
-    void show_injects()const;
-    void show_pills()const;
+    void show_all_meds()const;
+    void change_preservation_behavior(int id,Preservation_behavior *pb);
+    void change_dosage_behavior(int id,Dosage_behavior *db);
+    void update_dosage(int id);
     ~med_manager();
-
 };
 
 class my_system {
 private:
     med_manager pharmacy;
 public:
-    void run();//
+    void run();
 };
 
 #endif //PHARMACY_PHARMACY_H

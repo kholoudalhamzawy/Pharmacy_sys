@@ -1,22 +1,53 @@
 #include "pharmacy.h"
+Dosage_behavior::Dosage_behavior(/*Dosage_behavior* db*/){//3aiza thote fe elconstructor object bei inherate mn el constructor da aslan ? enty 3abyta ??
+}
+void Dosage_behavior::show_dosage() const {} //canttttt make them unimplemented, haiza3a2lek >:))
+void Dosage_behavior:: set_dosage(){}
+Dosage_behavior::~Dosage_behavior(){}
+
+Inject_dosage::Inject_dosage():Dosage_behavior(){
+    this->set_dosage();
+}
+void Inject_dosage::show_dosage()const{
+    cout<<num_of_injects<<" injects a day with a needle of size "<<size_of_needle<<" ml\n";
+}
+void Inject_dosage::set_dosage() {
+    int num=0;double size=0;
+    cout<<"enter num of injects and needle size\n";
+    cin>>num>>size;
+    this->num_of_injects=num;
+    this->size_of_needle=size;
+}
+Inject_dosage::~Inject_dosage(){}
+
+Pill_dosage::Pill_dosage():Dosage_behavior(){
+    this->set_dosage();
+}
+//no writing override or virtual or shit
+void Pill_dosage:: show_dosage()const  {
+    cout << pills_num << " pills a day of concentration " << med_concentration << " ml\n";
+}
+void Pill_dosage:: set_dosage() {
+    double cons=0;int num=0;
+    cout<<"enter num of pills and med concentration\n";
+    cin>>num>>cons;
+    this->pills_num = num;
+    this->med_concentration = cons;
+}
+Pill_dosage::~Pill_dosage(){}
+
+
+// cant make em virtual, da 3ade ?
+void Preservation_behavior::show_preservation () const{}
+void Moderate_preservation::show_preservation  () const {
+    cout<<"keep in moderate temp\n";
+}
+void Cold_preservation::show_preservation() const {
+    cout<<"keep in low temp\n";
+}
 
 med::med(){}
-med::med(const string& name,const int& id,const double& price):name(name),id(id),price(price){
-}
-///illogical to create a copy constructor, cause it has pure vertual methods
-//    med(const med& another){
-//        name=another.get_name();
-//        id=another.get_id();
-//        price=another.get_price();
-//    }
-
-//setters & getters
-void med::set_name(const string& name){
-    this->name=name;
-}
-const string& med::get_name() const{
-    return this->name;
-}
+med::med(const int& id,const double& price):id(id),price(price){}
 void med::set_id(const int& id){
     this->id=id;
 }
@@ -29,122 +60,60 @@ void med::set_price(const double& price){
 const double& med::get_price() const{
     return this->price;
 }
-///vitrual can olny be written inside a class, so we already did that in the header
-//    const string& med::get_type();
-//    void med::show_dosage()const;
-//    med* med::clone const;
-med:: ~med(){}
-
-
-
-inject:: inject():med(){};
-inject::inject(const string& name,const int& id,const double& price,const int& num_of_injects,const double& size_of_needle):med(name,id,price),num_of_injects(num_of_injects),size_of_needle(size_of_needle){
-    this->type="inject";
+void med::show_type()const {}
+void med::set_dosage_behavior(Dosage_behavior* db){
+    this->dosageBehavior=db;
 }
-/// malo4 lazma, leh ? mafeesh poiters, default copy constructors will do it.
-//    inject(const inject& another){     //copy constructor
-//        name=another.get_name();
-//        id=another.get_id();
-//        price=another.get_price();
-//        num_of_injects=another.get_injection_times();
-//        size_of_needle=another.get_needle_size();
-//
-//    }
-///
-/// cant write override
-const string& inject::get_type(){
-    this->type="inject";
-    return this->type;
+void med::set_preservation_behavior(Preservation_behavior* pb){
+    this->preservationBehavior=pb;
+//        pb= nullptr; //will this prevent the mimory leak? // did it in main
+}
+void med::show_preservation()const{
+    preservationBehavior->show_preservation();
+}
+void med::show_dosage()const{
+    dosageBehavior->show_dosage();
+}
+void med::set_dosage(){
+    dosageBehavior->set_dosage();
+}
+med::~med(){
+    dosageBehavior= nullptr;
+    preservationBehavior= nullptr;
 }
 
-void inject::set_needle_size(const double& size){
-    this->size_of_needle=size;
+
+Vitamins::Vitamins(const int& id,const double& price):med(id,price){
+    pd=new Pill_dosage();
+    mp=new Moderate_preservation();
+    set_dosage_behavior(pd);
+    set_preservation_behavior(mp);
+
 }
-const double& inject::get_needle_size() const{
-    return this->size_of_needle;
+void Vitamins::show_type()const{
+    cout<<"vitamin\n";
 }
-void inject::set_injection_times(const int& num){
-    this->num_of_injects=num;
-}
-const int& inject::get_injection_times() const{
-    return this->num_of_injects;
-}
-void inject::show_dosage()const{
-    cout<<num_of_injects<<" injects a day with a needle of size "<<size_of_needle<<"\n";
-}
-med* inject::clone() const{
-    return new inject(*this);
+Vitamins::~Vitamins(){
+    pd= nullptr;
+    mp = nullptr;
 }
 
-inject:: ~inject(){}
 
-
-
-
-pill::pill() : med() {
+Sedatives::Sedatives(const int& id,const double& price):med(id,price){
+    Id= new Inject_dosage();
+    cp= new Cold_preservation();
+    set_dosage_behavior(Id);
+    set_preservation_behavior(cp);
 }
-pill::pill(const string &name, const int &id, const double &price, const int &pills_num, const double &cons) : med(name, id,price),pills_num(pills_num),med_concentration(cons) {
-    //a7aaaaaa???????????????????????
-    //khkhkhkhkhkhkhkhkhkhkhkhkhhkhkhkhkhkhk
-    this->type = "pill";
+void Sedatives::show_type()const{
+    cout<<"sedative\n";
 }
-const string& pill::get_type() {
-    //keda a7aaaaa zabatet y3nyyyyyyy !!!!!!!!!
-    this->type = "pill";
-    return this->type;
+Sedatives::~Sedatives(){
+    Id= nullptr;
+    cp= nullptr;
 }
 
-const int &pill::get_pills_num() const {
-    return this->pills_num;
-}
-
-void pill::set_pills_num(const int &num) {
-    this->pills_num = num;
-}
-
-const double &pill::get_med_concentration() const {
-    return this->med_concentration;
-}
-
-void pill::set_med_concentration(const double &cons) {
-    this->med_concentration = cons;
-}
-
-void pill::show_dosage() const {
-    cout << pills_num << " pills a day of concentration " << med_concentration << " ml\n";
-}
-
-med* pill::clone() const {
-    return new pill(*this);
-}
-
-pill::~pill(){};
-
-
-
-med_manager::med_manager() {}
-
-
-//    med_manager(const med_manager &another){//copy constructor
-//        //is this onough?
-//        //// vector<med*> temp=another.get_meds();
-//        //or should i copy eace poiter?
-
-////cant do cause clone return med()
-//            inject* ptr=new inject(*element->clone());
-////        neither
-//            med* ptr=new inject(*element->clone());
-////        cant do cause not every med is inject
-//            med* ptr=new inject(element);
-///         neither, alot data is lost, med has pure vitrual methods
-//            med* ptr=new med()
-//}
-
-/// & before ::
-const vector<med*>& med_manager:: get_meds() const{
-    return this->all_meds;
-}
-
+med_manager::med_manager(){}
 bool med_manager::valid_id(const int &id)const{
     for (const auto &element:all_meds) {
         if (element->get_id() == id) {
@@ -153,45 +122,7 @@ bool med_manager::valid_id(const int &id)const{
     }
     return false;
 }
-void med_manager::show_med(const int &id)const{
-    if (all_meds.empty()){
-        cout << "no meds\n";
-        return;}
-    else
-        for (const auto &medecine:all_meds){
-            if(medecine->get_id()==id){
-                cout<<"name: "<<medecine->get_name()<<"\tprice: "<<medecine->get_price()<<"\ttype: "<<medecine->get_type()<<"\n";
-                medecine->show_dosage();
-                return;}
-
-        }
-    cout<<"med not found\n";
-    return;
-}
-void med_manager::add_med( med &medicine){
-    all_meds.push_back(medicine.clone()); ///use of clone
-    cout<<"med was added\n";
-
-///         the point of mplyphormism here, is with inheretence, when you inherite shit you can rewrite the methods, and use it with out knowing which subclass u'r using.
-//        cout<<medicine.clone()->get_type()<<" 3\n";  //workkkkkkkkkkkkkkkkkkkkkks 3adè
-//        cout<<medicine.get_type()<<" 3\n";
-
-}
-
-////balash t3mleeha, lee? 34an fe 7warat lama t3mly new pointers, zy ma biena fou2
-//    med* find_by_id(int id) const{
-//        for (const auto &injectt:all_meds){
-//            if(injectt->get_id()==id){
-//                //create a coppy constructor fouu2
-//                return injectt;
-//            }
-//            //will it return a copy constructor or the original pointer?
-//            //anaaaa 3aizaaaa arag3oooohhhhh hwaaaaagghh
-//        }
-//        return nullptr;
-//    }
-
-void med_manager::delete_med( const int &id) {
+void med_manager::delete_med( const int &id){
     auto it = all_meds.begin();
     while (it != all_meds.end()){
         if ((*it)->get_id() == id) {
@@ -205,8 +136,12 @@ void med_manager::delete_med( const int &id) {
     }
     cout<<"med not found\n";
     return;
-}
 
+}
+void med_manager::add_med( med *medicine){
+    all_meds.push_back(medicine);
+    cout<<"med was inserted\n";
+}
 void med_manager::update_price(int id,double new_price){
     if (!valid_id(id))
         cout<<"med not found\n";
@@ -221,42 +156,80 @@ void med_manager::update_price(int id,double new_price){
     }
     return;
 }
+void med_manager::show_med(const int &id)const{
+    if (all_meds.empty()){
+        cout << "no meds\n";
+        return;}
+    else
+        for (const auto &medecine:all_meds){
+            if(medecine->get_id()==id){
+                cout<<"price: "<<medecine->get_price()<<" LE \t type: ";
+                medecine->show_type();
+                cout<<"dosage: ";medecine->show_dosage();
+                cout<<"preservation: ";medecine->show_preservation();
+                return;}
 
-void med_manager::show_all_meds()const {
+        }
+    cout<<"med not found\n";
+    return;
+
+}
+void med_manager::show_all_meds()const{
     if (all_meds.empty())
         cout << "no meds\n";
     else
         for (const auto element:all_meds) {
-            cout << "id: " << element->get_id() << "\tprice: " << element->get_price() << "\ttype: "
-                 << element->get_type() << "\n";
+            cout << "\t# id: " << element->get_id()<<"\n";
+            this->show_med(element->get_id());
         }
+    return;
+}
+void med_manager::change_preservation_behavior(int id,Preservation_behavior *pb){
+    if (!valid_id(id))
+        cout<<"med not found\n";
+    else{
+        for (const auto &medecine:all_meds){
+            if(medecine->get_id()==id){
+                medecine->set_preservation_behavior(pb);
+                cout<<"behavior was updated\n";
+                return;
+            }
+        }
+    }
     return;
 
 }
-void med_manager::show_injects()const{
-    bool empty=1;
-    for (const auto &element:all_meds) {
-        if(element->get_type()=="inject"){
-            empty=0;
-            this->show_med(element->get_id());
+void med_manager::change_dosage_behavior(int id,Dosage_behavior *db){
+    if (!valid_id(id))
+        cout<<"med not found\n";
+    else{
+        for (const auto &medecine:all_meds){
+            if(medecine->get_id()==id){
+                medecine->set_dosage_behavior(db);
+                cout<<"Dosage was updated\n";
+                return;
+            }
         }
     }
-    if(empty)
-        cout<<"no injection meds\n";
     return;
+
 }
-void med_manager::show_pills()const{
-    bool empty=1;
-    for (const auto &element:all_meds) {
-        if(element->get_type()=="pill"){
-            empty=0;
-            this->show_med(element->get_id());
+void med_manager::update_dosage(int id){
+    if (!valid_id(id))
+        cout<<"med not found\n";
+    else{
+        for (const auto &medecine:all_meds){
+            if(medecine->get_id()==id){
+                medecine->set_dosage();
+                cout<<"Dosage was updated\n";
+                return;
+            }
         }
     }
-    if(empty)
-        cout<<"no pill meds\n";
     return;
+
 }
+
 med_manager::~med_manager(){
     for ( auto &element:all_meds) {
         delete element;
@@ -266,41 +239,33 @@ med_manager::~med_manager(){
 }
 
 
-
-void my_system::run() {
+void my_system ::run() {
     while(true){
-        cout<< "enter from 0 to 5:\n1: insert new med\n2: update price\n3: show meds\n4: search\n5: delete\n0: terminate\n";
+        cout<< "enter from 0 to 6:\n1: insert new med\n2: update price\n3: update behavior\n4: show meds\n5: search\n6: delete\n0: terminate\n";
         int option;
         cin >> option;
         switch (option) {
             case 1: {
-                cout << "enter med name, price, id\n";
-                string name;
+                cout << "enter med price and id\n";
                 double price;
                 int id;
                 int type;
-                cin >> name >> price >> id;
+                cin >> price >> id;
                 while(pharmacy.valid_id(id)){
                     cout<<"already existing id, enter another one\n";
                     cin>>id;
                 }
                 bool valid=0;
                 while (!valid){
-                    cout << "enter a type num from 1 to 2\n1: injections\t2: pills\t";
+                    cout << "enter a type num from 1 to 2\n1: vitamin\t2: Sedative\t";
                     cin >> type;
                     if (type == 1) {
                         valid=1;
-                        cout << "enter number of daily doses and size of needle\n";
-                        int injection_num;double needle_size;
-                        cin >> injection_num >> needle_size;
-                        inject med(name, id, price, injection_num, needle_size);
+                        Vitamins* med=new Vitamins(id, price);
                         pharmacy.add_med(med);
                     } else if (type == 2) {
                         valid=1;
-                        cout << "enter number of daily doses and med concentration in ml\n";
-                        int doses;double med_concentration;
-                        cin >> doses >> med_concentration;
-                        pill med(name, price, id, doses, med_concentration);
+                        Sedatives* med=new Sedatives(id,price);
                         pharmacy.add_med(med);
                     } else{
                         cout << "invalid number\n";
@@ -310,38 +275,79 @@ void my_system::run() {
             }
             case 2: {
                 cout << "enter the med id and the new price\n";
-                int id;
+                int id; double price;
+                cin>>id>>price;
+                if(!pharmacy.valid_id(id))
+                    cout<<"id not valid\n";
+                else
+                    pharmacy.update_price(id, price);
+
+                break;
+            }
+            case 3:{
+                cout << "enter the med id\n";
+                int id;cin>>id;
                 if(!pharmacy.valid_id(id))
                     cout<<"id not valid\n";
                 else{
-                    double price;
-                    cin >> id >> price;
-                    pharmacy.update_price(id, price);
+                    cout<<"press 1 to change dosage behavior, 2 to change preservation behavior\n";
+                    int option;cin>>option;
+                    if (option==1){
+                        cout<<"press 1 to change to injects, 2 to pills, 3 to update dosage\n";
+                        cin>>option;
+                        if (option==1){
+                            Inject_dosage* dosage=new Inject_dosage();
+                            pharmacy.change_dosage_behavior(id,dosage);
+                            dosage= nullptr;
+                        }
+                        else if(option==2){
+                            Pill_dosage* dosage=new Pill_dosage();
+                            pharmacy.change_dosage_behavior(id,dosage);
+                            dosage= nullptr;
+                        }
+                        else if(option==3){
+                            pharmacy.update_dosage(id);
+                        }
+                        else
+                            cout<<"invalid number\n";
+
+                    }
+                    else if(option==2){
+                        cout<<"press 1 to change to moderate, 2 to cold\n";
+                        cin>>option;
+                        if (option==1){
+                            Moderate_preservation* preservation=new Moderate_preservation();
+                            pharmacy.change_preservation_behavior(id,preservation);
+                            preservation= nullptr;
+
+                        }
+                        else if(option==2){
+                            Cold_preservation* preservation=new Cold_preservation();
+                            pharmacy.change_preservation_behavior(id,preservation);
+                            preservation= nullptr;
+                        }
+                        else
+                            cout<<"invalid number\n";
+                    }
+                    else
+                        cout<<"invalid number\n";
                 }
                 break;
-            }
-            case 3: {
-                cout << "press 1 to show all meds, 2: injections, 3:pills\n";
-                int option;
-                cin >> option;
-                if (option == 1)
-                    pharmacy.show_all_meds();
-                else if (option == 2)
-                    pharmacy.show_injects();
-                else if (option == 3)
-                    pharmacy.show_pills();
-                else
-                    cout << "invaled number\n";
-                break;
+
+
             }
             case 4: {
+                pharmacy.show_all_meds();
+                break;
+            }
+            case 5: {
                 cout << "enter med id\n";
                 int id;
                 cin >> id;
                 pharmacy.show_med(id);
                 break;
             }
-            case 5: {
+            case 6: {
                 cout << "enter med id\n";
                 int id;
                 cin >> id;
@@ -357,4 +363,3 @@ void my_system::run() {
         }
     }
 }
-
