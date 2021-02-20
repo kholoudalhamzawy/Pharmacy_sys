@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/KH/pharmacy/main.cpp
+pharmacy.h
+/Users/KH/pharmacy/pharmacy.h
+
+/Users/KH/pharmacy/pharmacy.cpp
+pharmacy.h
+/Users/KH/pharmacy/pharmacy.h
+
