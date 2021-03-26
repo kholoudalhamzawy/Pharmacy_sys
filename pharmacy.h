@@ -68,44 +68,78 @@ public:
     void show_dosage()const;
     void set_dosage();
     ~med();
-    
+
 };
 
-class Vitamins: public med {
+class Vitamins_cairo: public med {
 protected:
-    Pill_dosage *pd;
-    Moderate_preservation *mp;
+    Inject_dosage *Inject_Dosage;
+    Cold_preservation *Cold_Preservation;
 public:
-    Vitamins(const int &id, const double &price);
+    Vitamins_cairo(const int &id, const double &price);
     void show_type() const override;
-    ~Vitamins();
+    ~Vitamins_cairo();
 };
 
-class Sedatives: public med{
+class Vitamins_alex: public med {
 protected:
-    Inject_dosage* Id;
-    Cold_preservation* cp;
+    Pill_dosage *Pill_Dosage;
+    Moderate_preservation *Moderate_Preservation;
 public:
-    Sedatives(const int& id,const double& price);
-    void show_type()const override;
-    ~Sedatives();
+    Vitamins_alex(const int &id, const double &price);
+    void show_type() const override;
+    ~Vitamins_alex();
 };
 
-class simple_med_factory{
+class Sedatives_cairo: public med{
+protected:
+    Inject_dosage* Inject_Dosage;
+    Cold_preservation* Cold_Preservation;
+public:
+    Sedatives_cairo(const int& id,const double& price);
+    void show_type()const override;
+    ~Sedatives_cairo();
+
+
+};
+
+class Sedatives_alex: public med{
+protected:
+    Pill_dosage* Pill_Dosage;
+    Moderate_preservation* Moderate_Preservation;
+public:
+    Sedatives_alex(const int& id,const double& price);
+    void show_type()const override;
+    ~Sedatives_alex();
+};
+
+class med_factory{
 protected:
     med* medecation;
 public:
-    simple_med_factory();
-    med* create_med(string type,int id,double price);
-    ~simple_med_factory();
+    med_factory();
+    virtual med* create_med(string type,int id,double price);
+    ~med_factory();
+};
+
+class alex_factory: public med_factory{
+public:
+    med* create_med(string type,int id,double price)override;
+    ~alex_factory();
+};
+
+class cairo_factory: public med_factory{
+public:
+    med* create_med(string type,int id,double price)override;
 };
 
 class med_manager{
 protected:
-    simple_med_factory factory;
+    med_factory* factory;
     vector<med *> all_meds;
 public:
     med_manager();
+    void set_factory(string type);
     bool valid_id(const int &id)const;
     void delete_med( const int &id);
     void add_med(string type,int id,double price);
@@ -115,13 +149,14 @@ public:
     void change_preservation_behavior(int id,Preservation_behavior *pb);
     void change_dosage_behavior(int id,Dosage_behavior *db);
     void update_dosage(int id);
-    
+
     ~med_manager();
 };
 
 class my_system {
 private:
     med_manager pharmacy;
+
 public:
     void run();
 };
