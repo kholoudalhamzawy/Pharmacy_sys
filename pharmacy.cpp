@@ -3,14 +3,7 @@
 med::med(){}
 med::med(const string& name,const int& id,const double& price):name(name),id(id),price(price){
 }
-///illogical to create a copy constructor, cause it has pure vertual methods
-//    med(const med& another){
-//        name=another.get_name();
-//        id=another.get_id();
-//        price=another.get_price();
-//    }
 
-//setters & getters
 void med::set_name(const string& name){
     this->name=name;
 }
@@ -29,10 +22,7 @@ void med::set_price(const double& price){
 const double& med::get_price() const{
     return this->price;
 }
-///vitrual can olny be written inside a class, so we already did that in the header
-//    const string& med::get_type();
-//    void med::show_dosage()const;
-//    med* med::clone const;
+
 med:: ~med(){}
 
 
@@ -41,17 +31,7 @@ inject:: inject():med(){};
 inject::inject(const string& name,const int& id,const double& price,const int& num_of_injects,const double& size_of_needle):med(name,id,price),num_of_injects(num_of_injects),size_of_needle(size_of_needle){
     this->type="inject";
 }
-/// malo4 lazma, leh ? mafeesh poiters, default copy constructors will do it.
-//    inject(const inject& another){     //copy constructor
-//        name=another.get_name();
-//        id=another.get_id();
-//        price=another.get_price();
-//        num_of_injects=another.get_injection_times();
-//        size_of_needle=another.get_needle_size();
-//
-//    }
-///
-/// cant write override
+
 const string& inject::get_type(){
     this->type="inject";
     return this->type;
@@ -84,12 +64,8 @@ inject:: ~inject(){}
 pill::pill() : med() {
 }
 pill::pill(const string &name, const int &id, const double &price, const int &pills_num, const double &cons) : med(name, id,price),pills_num(pills_num),med_concentration(cons) {
-    //a7aaaaaa???????????????????????
-    //khkhkhkhkhkhkhkhkhkhkhkhkhhkhkhkhkhkhk
-    this->type = "pill";
 }
 const string& pill::get_type() {
-    //keda a7aaaaa zabatet y3nyyyyyyy !!!!!!!!!
     this->type = "pill";
     return this->type;
 }
@@ -124,23 +100,6 @@ pill::~pill(){};
 
 med_manager::med_manager() {}
 
-
-//    med_manager(const med_manager &another){//copy constructor
-//        //is this onough?
-//        //// vector<med*> temp=another.get_meds();
-//        //or should i copy eace poiter?
-
-////cant do cause clone return med()
-//            inject* ptr=new inject(*element->clone());
-////        neither
-//            med* ptr=new inject(*element->clone());
-////        cant do cause not every med is inject
-//            med* ptr=new inject(element);
-///         neither, alot data is lost, med has pure vitrual methods
-//            med* ptr=new med()
-//}
-
-/// & before ::
 const vector<med*>& med_manager:: get_meds() const{
     return this->all_meds;
 }
@@ -170,26 +129,7 @@ void med_manager::show_med(const int &id)const{
 }
 void med_manager::add_med( med &medicine){
     all_meds.push_back(medicine.clone()); ///use of clone
-    cout<<"med was added\n";
-
-///         the point of mplyphormism here, is with inheretence, when you inherite shit you can rewrite the methods, and use it with out knowing which subclass u'r using.
-//        cout<<medicine.clone()->get_type()<<" 3\n";  //workkkkkkkkkkkkkkkkkkkkkks 3adè
-//        cout<<medicine.get_type()<<" 3\n";
-
-}
-
-////balash t3mleeha, lee? 34an fe 7warat lama t3mly new pointers, zy ma biena fou2
-//    med* find_by_id(int id) const{
-//        for (const auto &injectt:all_meds){
-//            if(injectt->get_id()==id){
-//                //create a coppy constructor fouu2
-//                return injectt;
-//            }
-//            //will it return a copy constructor or the original pointer?
-//            //anaaaa 3aizaaaa arag3oooohhhhh hwaaaaagghh
-//        }
-//        return nullptr;
-//    }
+    cout<<"med was added\n";}
 
 void med_manager::delete_med( const int &id) {
     auto it = all_meds.begin();
@@ -197,9 +137,7 @@ void med_manager::delete_med( const int &id) {
         if ((*it)->get_id() == id) {
             delete *it;
             all_meds.erase(it);
-            ///wtf ? told me libc++abi.dylib: Pure virtual function called! w m4a w sabny !! :(
-            //delete *it;
-            cout<<"med was deleted\n";
+           cout<<"med was deleted\n";
             return;}
         it++;
     }
@@ -311,11 +249,11 @@ void my_system::run() {
             case 2: {
                 cout << "enter the med id and the new price\n";
                 int id;
+                double price;
+                cin >> id >> price;
                 if(!pharmacy.valid_id(id))
                     cout<<"id not valid\n";
                 else{
-                    double price;
-                    cin >> id >> price;
                     pharmacy.update_price(id, price);
                 }
                 break;

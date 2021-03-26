@@ -19,7 +19,6 @@ public:
     const int& get_id() const;
     void set_price(const double& price);
     const double& get_price() const;
-    ///pure virtual definetion have to be with the word virtual, and u cant use virtual out side the clas, aka in the pharma.cpp
     virtual const string& get_type()=0;
     virtual void show_dosage()const=0;
     virtual med* clone()const=0;
@@ -55,7 +54,7 @@ protected:
 public:
     pill();
     pill(const string &name, const int &id, const double &price, const int &pills_num, const double &cons);
-    const string& get_type() override; //
+    const string& get_type() override;
     const int &get_pills_num() const ;
     void set_pills_num(const int &num);
     const double &get_med_concentration() const;
@@ -77,12 +76,12 @@ public:
     med_manager();
 
     const vector<med*>& get_meds()const;
-    bool valid_id(const int &id)const;//
+    bool valid_id(const int &id)const;
     void show_med(const int &id)const;
-    void show_all_meds()const; //
-    void add_med( med &medicine);//
-    void delete_med( const int &id);//
-    void update_price(int id,double new_price);//
+    void show_all_meds()const;
+    void add_med( med &medicine);
+    void delete_med( const int &id);
+    void update_price(int id,double new_price);
     void show_injects()const;
     void show_pills()const;
     ~med_manager();
