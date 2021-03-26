@@ -91,20 +91,31 @@ public:
     ~Sedatives();
 };
 
+class simple_med_factory{
+protected:
+    med* medecation;
+public:
+    simple_med_factory();
+    med* create_med(string type,int id,double price);
+    ~simple_med_factory();
+};
+
 class med_manager{
 protected:
+    simple_med_factory factory;
     vector<med *> all_meds;
 public:
     med_manager();
     bool valid_id(const int &id)const;
     void delete_med( const int &id);
-    void add_med( med *medicine);
+    void add_med(string type,int id,double price);
     void update_price(int id,double new_price);
     void show_med(const int &id)const;
     void show_all_meds()const;
     void change_preservation_behavior(int id,Preservation_behavior *pb);
     void change_dosage_behavior(int id,Dosage_behavior *db);
     void update_dosage(int id);
+    
     ~med_manager();
 };
 

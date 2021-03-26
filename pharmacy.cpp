@@ -1,6 +1,7 @@
 #include "pharmacy.h"
-Dosage_behavior::Dosage_behavior(){
-}
+
+
+Dosage_behavior::Dosage_behavior(){}
 void Dosage_behavior::show_dosage() const {}
 void Dosage_behavior:: set_dosage(){}
 Dosage_behavior::~Dosage_behavior(){}
@@ -110,6 +111,22 @@ Sedatives::~Sedatives(){
     cp= nullptr;
 }
 
+simple_med_factory::simple_med_factory(){
+    medecation= nullptr;
+}
+med* simple_med_factory::create_med(string type,int id,double price){
+    if (type=="Vitamins"){
+        medecation=new Vitamins(id,price);
+    }
+    else if(type=="Sedatives"){
+        medecation=new Sedatives(id,price);
+    }
+    return medecation;
+}
+simple_med_factory::~simple_med_factory(){
+    medecation= nullptr;
+}
+
 med_manager::med_manager(){}
 bool med_manager::valid_id(const int &id)const{
     for (const auto &element:all_meds) {
@@ -133,8 +150,8 @@ void med_manager::delete_med( const int &id){
     return;
     
 }
-void med_manager::add_med( med *medicine){
-    all_meds.push_back(medicine);
+void med_manager::add_med( string type,int id,double price){
+    all_meds.push_back(factory.create_med(type,id,price));
     cout<<"med was inserted\n";
 }
 void med_manager::update_price(int id,double new_price){
@@ -252,16 +269,14 @@ void my_system ::run() {
                 }
                 bool valid=0;
                 while (!valid){
-                    cout << "enter a type num from 1 to 2\n1: vitamin\t2: Sedative\t";
+                    cout << "enter a type num from 1 to 2\n1: Vitamin\t2: Sedative\t";
                     cin >> type;
                     if (type == 1) {
                         valid=1;
-                        Vitamins* med=new Vitamins(id, price);
-                        pharmacy.add_med(med);
+                        pharmacy.add_med("Vitamins",id,price);
                     } else if (type == 2) {
                         valid=1;
-                        Sedatives* med=new Sedatives(id,price);
-                        pharmacy.add_med(med);
+                        pharmacy.add_med("Sedatives",id,price);
                     } else{
                         cout << "invalid number\n";
                     }
