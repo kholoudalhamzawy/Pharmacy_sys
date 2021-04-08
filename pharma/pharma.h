@@ -1,9 +1,15 @@
-#ifndef PHARMACY_PHARMACY_H
-#define PHARMACY_PHARMACY_H
+//
+// Created by KH on 4/8/21.
+//
+
+#ifndef PHARMACY_PHARMA_H
+#define PHARMACY_PHARMA_H
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <memory>
+#include <cstddef>
 using namespace std;
 class Dosage_behavior{
 public:
@@ -69,7 +75,7 @@ public:
     void show_dosage()const;
     void set_dosage();
     ~med();
-    
+
 };
 
 class Vitamins_cairo: public med {
@@ -100,8 +106,6 @@ public:
     Sedatives_cairo(const int& id,const double& price);
     void show_type()const override;
     ~Sedatives_cairo();
-    
-    
 };
 
 class Sedatives_alex: public med{
@@ -147,19 +151,23 @@ public:
     void update_price(int id,double new_price);
     void show_med(const int &id)const;
     void show_all_meds()const;
-    void change_preservation_behavior(int id,unique_ptr<Preservation_behavior>pb);
-    void change_dosage_behavior(int id,unique_ptr<Dosage_behavior>db);
+    bool change_preservation_behavior(int id,unique_ptr<Preservation_behavior>pb);
+    bool change_dosage_behavior(int id,unique_ptr<Dosage_behavior>db);
     void update_dosage(int id);
-    
+    vector<unique_ptr<med>>::size_type get_meds_num();
+    unique_ptr<med> get_med(int id);
+
+
+
     ~med_manager();
 };
 
 class my_system {
 private:
     med_manager pharmacy;
-    
+
 public:
     void run();
 };
 
-#endif //PHARMACY_PHARMACY_H
+#endif //PHARMACY_PHARMA_H

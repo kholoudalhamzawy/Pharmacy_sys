@@ -8,3 +8,4 @@
   - set to inject behavior: needle size and number of injects a day.
   - set to pill behavior: concentration of pills and number of pills a day.
 * you will be asked for the med id, price, type, and dosage by its default behavior every time you insert a med.
+* the main methods are tested using gtest.
