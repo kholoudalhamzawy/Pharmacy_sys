@@ -58,11 +58,11 @@ const double& med::get_price() const{
     return this->price;
 }
 void med::show_type()const {}
-void med::set_dosage_behavior(Dosage_behavior* db){
-    this->dosageBehavior=db;
+void med::set_dosage_behavior(unique_ptr<Dosage_behavior> db){
+    this->dosageBehavior= move(db);
 }
-void med::set_preservation_behavior(Preservation_behavior* pb){
-    this->preservationBehavior=pb;
+void med::set_preservation_behavior(unique_ptr<Preservation_behavior> pb){
+    this->preservationBehavior= move(pb);
 }
 void med::show_preservation()const{
     preservationBehavior->show_preservation();
@@ -74,73 +74,57 @@ void med::set_dosage(){
     dosageBehavior->set_dosage();
 }
 med::~med(){
-    dosageBehavior= nullptr;
-    preservationBehavior= nullptr;
 }
 
 
 Vitamins_cairo::Vitamins_cairo(const int& id,const double& price):med(id,price){
-    Inject_Dosage=new Inject_dosage();
-    Cold_Preservation=new Cold_preservation();
-    set_dosage_behavior(Inject_Dosage);
-    set_preservation_behavior(Cold_Preservation);
-
+    // two ways
+    Cold_Preservation=make_unique<Cold_preservation>();
+    set_dosage_behavior(make_unique<Inject_dosage>());
+    set_preservation_behavior(move(Cold_Preservation));
+    
 }
 void Vitamins_cairo::show_type()const{
     cout<<"vitamin\n";
 }
 Vitamins_cairo::~Vitamins_cairo(){
-    Inject_Dosage= nullptr;
-    Cold_Preservation= nullptr;
 }
 
 Vitamins_alex::Vitamins_alex(const int& id,const double& price):med(id,price){
-    Pill_Dosage=new Pill_dosage();
-    Moderate_Preservation=new Moderate_preservation();
-    set_dosage_behavior(Pill_Dosage);
-    set_preservation_behavior(Moderate_Preservation);
-
+    set_dosage_behavior(make_unique<Pill_dosage>());
+    set_preservation_behavior(make_unique<Moderate_preservation>());
+    
 }
 void Vitamins_alex::show_type()const{
     cout<<"vitamin\n";
 }
 Vitamins_alex::~Vitamins_alex(){
-    Pill_Dosage= nullptr;
-    Moderate_Preservation= nullptr;
 }
 
 
 Sedatives_cairo::Sedatives_cairo(const int& id,const double& price):med(id,price){
-    Inject_Dosage=new Inject_dosage();
-    Cold_Preservation=new Cold_preservation();
-    set_dosage_behavior(Inject_Dosage);
-    set_preservation_behavior(Cold_Preservation);
-
+    set_dosage_behavior(make_unique<Inject_dosage>());
+    set_preservation_behavior(make_unique<Cold_preservation>());
+    
 }
 void Sedatives_cairo::show_type()const{
     cout<<"sedative\n";
 }
 Sedatives_cairo::~Sedatives_cairo(){
-    Inject_Dosage= nullptr;
-    Cold_Preservation= nullptr;
 }
 Sedatives_alex::Sedatives_alex(const int &id, const double &price):med(id,price) {
-    Pill_Dosage=new Pill_dosage();
-    Moderate_Preservation=new Moderate_preservation();
-    set_dosage_behavior(Pill_Dosage);
-    set_preservation_behavior(Moderate_Preservation);
+    
+    set_dosage_behavior(make_unique<Pill_dosage>());
+    set_preservation_behavior(make_unique<Moderate_preservation>());
 }
 void Sedatives_alex::show_type()const{
     cout<<"sedative\n";
 }
 Sedatives_alex::~Sedatives_alex(){
-    Pill_Dosage= nullptr;
-    Moderate_Preservation= nullptr;
 }
 
 
 med_manager::med_manager(){
-    factory= nullptr;
 }
 bool med_manager::valid_id(const int &id)const{
     for (const auto &element:all_meds) {
@@ -154,7 +138,7 @@ void med_manager::delete_med( const int &id){
     auto it = all_meds.begin();
     while (it != all_meds.end()){
         if ((*it)->get_id() == id) {
-            delete *it;
+            (*it).reset();
             all_meds.erase(it);
             cout<<"med was deleted\n";
             return;}
@@ -162,7 +146,7 @@ void med_manager::delete_med( const int &id){
     }
     cout<<"med not found\n";
     return;
-
+    
 }
 void med_manager::update_price(int id,double new_price){
     if (!valid_id(id))
@@ -190,60 +174,58 @@ void med_manager::show_med(const int &id)const{
                 cout<<"dosage: ";medecine->show_dosage();
                 cout<<"preservation: ";medecine->show_preservation();
                 return;}
-
+            
         }
     cout<<"med not found\n";
     return;
-
+    
 }
 void med_manager::show_all_meds()const{
     if (all_meds.empty())
         cout << "no meds\n";
     else
-        for (const auto element:all_meds) {
+        for (const auto &element:all_meds) {
             cout << "\t# id: " << element->get_id()<<"\n";
             this->show_med(element->get_id());
         }
     return;
 }
-void med_manager::change_preservation_behavior(int id,Preservation_behavior *pb){
+void med_manager::change_preservation_behavior(int id,unique_ptr<Preservation_behavior> pb){
     if (!valid_id(id))
         cout<<"med not found\n";
     else{
         for (const auto &medecine:all_meds){
             if(medecine->get_id()==id){
-                medecine->set_preservation_behavior(pb);
+                medecine->set_preservation_behavior(move(pb));
                 cout<<"behavior was updated\n";
                 return;
             }
         }
     }
     return;
-
+    
 }
-void med_manager::change_dosage_behavior(int id,Dosage_behavior *db){
+void med_manager::change_dosage_behavior(int id,unique_ptr<Dosage_behavior> db){
     if (!valid_id(id))
         cout<<"med not found\n";
     else{
         for (const auto &medecine:all_meds){
             if(medecine->get_id()==id){
-                medecine->set_dosage_behavior(db);
+                medecine->set_dosage_behavior(move(db));
                 cout<<"Dosage was updated\n";
                 return;
             }
         }
     }
     return;
-
+    
 }
-med* med_factory::create_med(string type,int id,double price){
+unique_ptr<med> med_factory::create_med(string type,int id,double price){
 }
 
 med_factory::med_factory(){
-    medecation= nullptr;
 }
 med_factory::~med_factory(){
-    medecation= nullptr;
 }
 void med_manager::update_dosage(int id){
     if (!valid_id(id))
@@ -258,14 +240,14 @@ void med_manager::update_dosage(int id){
         }
     }
     return;
-
+    
 }
 void med_manager::set_factory(string type){
     if (type=="alex"){
-        this->factory=new alex_factory;
+        this->factory=make_unique<alex_factory>();
     }
     else if(type=="cairo"){
-        this->factory=new cairo_factory;
+        this->factory=make_unique<cairo_factory>();
     }
 }
 void med_manager::add_med(string type,int id,double price){
@@ -273,33 +255,27 @@ void med_manager::add_med(string type,int id,double price){
     cout<<"med was inserted\n";
 }
 med_manager::~med_manager(){
-    for ( auto &element:all_meds) {
-        delete element;
-        element= nullptr;
-    }
-    all_meds.clear();
-    this->factory= nullptr;
 }
-med* alex_factory::create_med(string type,int id,double price){
+unique_ptr<med> alex_factory::create_med(string type,int id,double price){
     if (type=="Vitamins"){
-        medecation=new Vitamins_cairo(id,price);
+        medecation=make_unique<Vitamins_cairo>(id,price);
     }
     else if(type=="Sedatives"){
-        medecation=new Sedatives_cairo(id,price);
+        medecation=make_unique<Sedatives_cairo>(id,price);
     }
-    return medecation;
+    return move(medecation);
 }
 
 alex_factory::~alex_factory(){
 }
-med* cairo_factory::create_med(string type,int id,double price){
+unique_ptr<med> cairo_factory::create_med(string type,int id,double price){
     if (type=="Vitamins"){
-        medecation=new Vitamins_cairo(id,price);
+        medecation=make_unique<Vitamins_cairo>(id,price);
     }
     else if(type=="Sedatives"){
-        medecation=new Sedatives_cairo(id,price);
+        medecation=make_unique<Sedatives_cairo>(id,price);
     }
-    return medecation;
+    return move(medecation);
 }
 
 void my_system ::run() {
@@ -345,7 +321,7 @@ void my_system ::run() {
                     cout<<"id not valid\n";
                 else
                     pharmacy.update_price(id, price);
-
+                
                 break;
             }
             case 3:{
@@ -360,35 +336,27 @@ void my_system ::run() {
                         cout<<"press 1 to change to injects, 2 to pills, 3 to update dosage\n";
                         cin>>option;
                         if (option==1){
-                            Inject_dosage* dosage=new Inject_dosage();
-                            pharmacy.change_dosage_behavior(id,dosage);
-                            dosage= nullptr;
+                            pharmacy.change_dosage_behavior(id,make_unique<Inject_dosage>());
                         }
                         else if(option==2){
-                            Pill_dosage* dosage=new Pill_dosage();
-                            pharmacy.change_dosage_behavior(id,dosage);
-                            dosage= nullptr;
+                            pharmacy.change_dosage_behavior(id,make_unique<Pill_dosage>());
                         }
                         else if(option==3){
                             pharmacy.update_dosage(id);
                         }
                         else
                             cout<<"invalid number\n";
-
+                        
                     }
                     else if(option==2){
                         cout<<"press 1 to change to moderate, 2 to cold\n";
                         cin>>option;
                         if (option==1){
-                            Moderate_preservation* preservation=new Moderate_preservation();
-                            pharmacy.change_preservation_behavior(id,preservation);
-                            preservation= nullptr;
-
+                            pharmacy.change_preservation_behavior(id,make_unique<Moderate_preservation>());
+                            
                         }
                         else if(option==2){
-                            Cold_preservation* preservation=new Cold_preservation();
-                            pharmacy.change_preservation_behavior(id,preservation);
-                            preservation= nullptr;
+                            pharmacy.change_preservation_behavior(id,make_unique<Cold_preservation>());
                         }
                         else
                             cout<<"invalid number\n";
@@ -397,8 +365,8 @@ void my_system ::run() {
                         cout<<"invalid number\n";
                 }
                 break;
-
-
+                
+                
             }
             case 4: {
                 pharmacy.show_all_meds();

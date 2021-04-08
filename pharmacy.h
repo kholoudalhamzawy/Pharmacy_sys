@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 using namespace std;
 class Dosage_behavior{
 public:
@@ -52,8 +53,8 @@ public:
 class med{
 protected:
     int id;double price;
-    Dosage_behavior* dosageBehavior;
-    Preservation_behavior* preservationBehavior;
+    unique_ptr<Dosage_behavior> dosageBehavior;
+    unique_ptr<Preservation_behavior> preservationBehavior;
 public:
     med();
     med(const int& id,const double& price);
@@ -62,19 +63,19 @@ public:
     void set_price(const double& price);
     const double& get_price() const;
     virtual void show_type()const;
-    void set_dosage_behavior(Dosage_behavior* db);
-    void set_preservation_behavior(Preservation_behavior* pb);
+    void set_dosage_behavior(unique_ptr<Dosage_behavior> db);
+    void set_preservation_behavior(unique_ptr<Preservation_behavior> pb);
     void show_preservation() const;
     void show_dosage()const;
     void set_dosage();
     ~med();
-
+    
 };
 
 class Vitamins_cairo: public med {
 protected:
-    Inject_dosage *Inject_Dosage;
-    Cold_preservation *Cold_Preservation;
+    unique_ptr<Inject_dosage> Inject_Dosage;
+    unique_ptr<Cold_preservation> Cold_Preservation;
 public:
     Vitamins_cairo(const int &id, const double &price);
     void show_type() const override;
@@ -83,8 +84,8 @@ public:
 
 class Vitamins_alex: public med {
 protected:
-    Pill_dosage *Pill_Dosage;
-    Moderate_preservation *Moderate_Preservation;
+    unique_ptr<Pill_dosage> Pill_Dosage;
+    unique_ptr<Moderate_preservation> Moderate_Preservation;
 public:
     Vitamins_alex(const int &id, const double &price);
     void show_type() const override;
@@ -93,20 +94,20 @@ public:
 
 class Sedatives_cairo: public med{
 protected:
-    Inject_dosage* Inject_Dosage;
-    Cold_preservation* Cold_Preservation;
+    unique_ptr<Inject_dosage> Inject_Dosage;
+    unique_ptr<Cold_preservation> Cold_Preservation;
 public:
     Sedatives_cairo(const int& id,const double& price);
     void show_type()const override;
     ~Sedatives_cairo();
-
-
+    
+    
 };
 
 class Sedatives_alex: public med{
 protected:
-    Pill_dosage* Pill_Dosage;
-    Moderate_preservation* Moderate_Preservation;
+    unique_ptr<Pill_dosage> Pill_Dosage;
+    unique_ptr<Moderate_preservation> Moderate_Preservation;
 public:
     Sedatives_alex(const int& id,const double& price);
     void show_type()const override;
@@ -115,28 +116,28 @@ public:
 
 class med_factory{
 protected:
-    med* medecation;
+    unique_ptr<med> medecation;
 public:
     med_factory();
-    virtual med* create_med(string type,int id,double price);
+    virtual unique_ptr<med> create_med(string type,int id,double price); //virtual but written with practices, cant be pure???????
     ~med_factory();
 };
 
 class alex_factory: public med_factory{
 public:
-    med* create_med(string type,int id,double price)override;
+    unique_ptr<med> create_med(string type,int id,double price)override;
     ~alex_factory();
 };
 
 class cairo_factory: public med_factory{
 public:
-    med* create_med(string type,int id,double price)override;
+    unique_ptr<med> create_med(string type,int id,double price)override;
 };
 
 class med_manager{
 protected:
-    med_factory* factory;
-    vector<med *> all_meds;
+    unique_ptr<med_factory> factory;
+    vector<unique_ptr<med>> all_meds;
 public:
     med_manager();
     void set_factory(string type);
@@ -146,17 +147,17 @@ public:
     void update_price(int id,double new_price);
     void show_med(const int &id)const;
     void show_all_meds()const;
-    void change_preservation_behavior(int id,Preservation_behavior *pb);
-    void change_dosage_behavior(int id,Dosage_behavior *db);
+    void change_preservation_behavior(int id,unique_ptr<Preservation_behavior>pb);
+    void change_dosage_behavior(int id,unique_ptr<Dosage_behavior>db);
     void update_dosage(int id);
-
+    
     ~med_manager();
 };
 
 class my_system {
 private:
     med_manager pharmacy;
-
+    
 public:
     void run();
 };
